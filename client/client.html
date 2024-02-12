@@ -5,7 +5,88 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
   
   <script>
+    const handleResponse = async (response, parseResponse) => {
+      // Get the content section for later writing
+      const content = document.querySelector('#content');
 
+      // Determine the result of the given status responses
+      switch(response.status)
+      {
+        case 200:
+          break;
+          
+        case 201:
+          break;
+
+        case 400:
+          break;
+
+        case 404:
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    const requestUpdateMethod = async (userForm) => {
+      // Grab the URL and method form the form
+      const url = userForm.querySelector('#urlField'.value);
+      const method = userForm.querySelector('#methodSelect').value;
+
+      // Await the fetch response
+      let response = await fetch(url, {
+        method,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      // Handle the response when given
+      handleResponse(response, method === 'get');
+    }
+
+    const requestAddUser = async (userForm) => {
+      // Get the data form the form
+      let userData = {
+        name: userForm.querySelector('#nameField').value,
+        age: userForm.querySelector('#ageField').value
+      }
+
+      let response = await fetch("/addUser", {
+        POST,
+        headers: {
+          'Accept': 'application/json'
+        },
+        userData
+      })
+
+      // Handle the response when given
+      handleResponse(response, method === 'post');
+    }
+
+    const init = () => {
+      // Get the form
+      const userForm = document.querySelector('#userForm');
+      const nameForm = document.querySelector('#nameForm');
+
+      // Create event functions to handle the request
+      const getUsers = (e) => {
+        e.preventDefault();
+        requestUpdateMethod(userForm);
+        return false;
+      }
+
+      const addUser = (e) => {
+        e.preventDefault();
+        requestAddUser(nameForm);
+        return false;
+      }
+
+      // Add the event listener
+      userForm.addEventListener('submit', getUsers);
+      nameForm.addEventListener('submit', addUser);
+    }
   </script>
 </head>
 <body>
