@@ -10,39 +10,68 @@ const jsonHandler = require('./jsonResponses.js');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const urlStruct = {
-  "GET": {
+  GET: {
     '/': htmlHandler.getIndexPage,
     '/style.css': cssHandler.getIndexStyle,
     '/getUsers': jsonHandler.getUsers,
     '/notReal': jsonHandler.notFound,
-    notFound: jsonHandler.notFound
+    notFound: jsonHandler.notFound,
 
   },
-  "HEAD": {
+  HEAD: {
     '/getUsers': jsonHandler.getUsersMeta,
     '/notReal': jsonHandler.notFoundMeta,
-    notFound: jsonHandler.notFoundMeta
+    notFound: jsonHandler.notFoundMeta,
   },
-  "POST": {
-    '/addUser': jsonHandler.updateUser
+  POST: {
+    '/addUser': jsonHandler.updateUser,
   },
 };
 
 // Server functions
+const parseBody = (request, response, handler) => {
+  // Create a container for the data
+  const body = [];
+
+  // If there's an error, throw it
+  request.on('error', (err) => {
+    console.dir(err);
+    response.statusCode = 400;
+    response.end();
+  });
+
+  // Add the data to the body as it comes in
+  request.on('data', (chunk) => {
+    body.push(chunk);
+  });
+
+  // On end, parse the full body and post the data
+  request.on('end', () => {
+    const bodyString = Buffer.concat(body).toString();
+    const bodyParams = query.parse(bodyString);
+
+    handler(request, response, bodyParams);
+  });
+};
+
 const onRequest = (request, response) => {
+  // Parse the URL
   const parsedURL = url.parse(request.url);
 
   // Check if the URL struct contains the request method
-  if(!urlStruct[request.method])
-  {
+  if (!urlStruct[request.method]) {
     // If not, return the HEAD's not found response
     return urlStruct.HEAD.notFound(request, response);
   }
 
-  // Check if the pathname exists within the URL struct's 
+  // Check if the pathname exists within the URL struct's
   // request method object
-  if(urlStruct[request.method][parsedURL.pathname])
-  {
+  if (urlStruct[request.method][parsedURL.pathname]) {
+    if (request.method === 'POST') {
+      // Parse the data being uploaded
+      return parseBody(request, response, urlStruct[request.method][parsedURL.pathname]);
+    }
+
     // Return the path's response
     return urlStruct[request.method][parsedURL.pathname](request, response);
   }

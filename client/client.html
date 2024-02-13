@@ -13,80 +13,107 @@
       switch(response.status)
       {
         case 200:
+          content.innerHTML = '<b>Success</b>';
           break;
           
         case 201:
+        content.innerHTML = '<b>Created</b>';
           break;
 
         case 400:
+        content.innerHTML = '<b>Bad Request</b>';
           break;
 
         case 404:
+        content.innerHTML = '<b>Resource Not Found</b>';
           break;
 
         default:
+        content.innerHTML = '<b>Error code not implemented by client</b>';
           break;
+      }
+
+      // Check if we should parse a response
+      if(parseResponse)
+      {
+        // Parse the response to JSON
+        let obj = await response.json();
+
+        // Stringify and display
+        let jsonString = JSON.stringify(obj);
+        content.innerHTML += `<p>${jsonString}</p>`;
+      } else {
+        // State that meta data was received if a response should not be parsed
+        content.innerHTML += '<p>Meta Data Received</p>';
       }
     }
 
     const requestUpdateMethod = async (userForm) => {
       // Grab the URL and method form the form
-      const url = userForm.querySelector('#urlField'.value);
+      const url = userForm.querySelector('#urlField').value;
       const method = userForm.querySelector('#methodSelect').value;
 
       // Await the fetch response
       let response = await fetch(url, {
-        method,
+        method: method,
         headers: {
           'Accept': 'application/json'
         }
       });
 
-      // Handle the response when given
+      // Handle the response when fetched, parse if not a HEAD method call
       handleResponse(response, method === 'get');
     }
 
-    const requestAddUser = async (userForm) => {
-      // Get the data form the form
-      let userData = {
-        name: userForm.querySelector('#nameField').value,
-        age: userForm.querySelector('#ageField').value
-      }
+    const requestAddUser = async (nameForm) => {
+      //Grab all the info from the form
+      const nameAction = nameForm.getAttribute('action');
+      const nameMethod = nameForm.getAttribute('method');
+      
+      const nameField = nameForm.querySelector('#nameField');
+      const ageField = nameForm.querySelector('#ageField');
 
-      let response = await fetch("/addUser", {
-        POST,
+      //Build a data string in the FORM-URLENCODED format.
+      const formData = `name=${nameField.value}&age=${ageField.value}`;
+
+      //Make a fetch request and await a response.
+      let response = await fetch(nameAction, {
+        method: nameMethod,
         headers: {
-          'Accept': 'application/json'
+          'Content-Type': 'application/x-www-urlencoded',
+          'Accept': 'application/json',
         },
-        userData
-      })
+        body: formData,
+      });
 
-      // Handle the response when given
-      handleResponse(response, method === 'post');
+      //Once we have a response, handle it.
+      handleResponse(response, true);
     }
 
     const init = () => {
       // Get the form
-      const userForm = document.querySelector('#userForm');
       const nameForm = document.querySelector('#nameForm');
-
+      const userForm = document.querySelector('#userForm');
+      
       // Create event functions to handle the request
-      const getUsers = (e) => {
-        e.preventDefault();
-        requestUpdateMethod(userForm);
-        return false;
-      }
-
       const addUser = (e) => {
         e.preventDefault();
         requestAddUser(nameForm);
         return false;
       }
 
+      const getUsers = (e) => {
+        e.preventDefault();
+        requestUpdateMethod(userForm);
+        return false;
+      }
+
       // Add the event listener
-      userForm.addEventListener('submit', getUsers);
       nameForm.addEventListener('submit', addUser);
+      userForm.addEventListener('submit', getUsers);
     }
+
+    window.onload = init;
   </script>
 </head>
 <body>
