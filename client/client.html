@@ -20,6 +20,10 @@
         content.innerHTML = '<b>Created</b>';
           break;
 
+        case 204:
+          content.innerHTML = '<b>Updated</b>'
+          break;
+
         case 400:
         content.innerHTML = '<b>Bad Request</b>';
           break;
@@ -39,9 +43,15 @@
         // Parse the response to JSON
         let obj = await response.json();
 
-        // Stringify and display
-        let jsonString = JSON.stringify(obj);
-        content.innerHTML += `<p>${jsonString}</p>`;
+        // Check for a message
+        if(obj.message)
+        {
+          // Display the messgae
+          content.innerHTML += `<p>${obj.message}</p>`;
+        }
+
+        // Print the object in the console
+        console.log(JSON.stringify(obj));
       } else {
         // State that meta data was received if a response should not be parsed
         content.innerHTML += '<p>Meta Data Received</p>';

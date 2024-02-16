@@ -21,7 +21,7 @@ const respondJSONMeta = (request, response, status) => {
 const getUsers = (request, response) => {
   // Create the JSON object to send
   const responseJSON = {
-    users,
+    message: JSON.stringify(users),
   };
 
   // Return with success
@@ -34,6 +34,12 @@ const getUsersMeta = (request, response) => {
 };
 
 const updateUser = (request, response, data) => {
+  // Create a response
+  let responseJSON = {
+    message: 'User created successfully',
+    id: 'userCreatedSuccess',
+  };
+
   // Parse the data into an object
   const newUser = {
     name: data.name,
@@ -42,11 +48,9 @@ const updateUser = (request, response, data) => {
 
   // Check if both a name and age were given
   if (!newUser.name || !newUser.age) {
-    // Create an error response
-    const responseJSON = {
-      message: 'Name and age are both required to add or update an existing user',
-      id: 'addUserMissingParams',
-    };
+    // Update response
+    responseJSON.message = 'Name and age are both required to add or update an existing user';
+    responseJSON.id = 'addUserMissingParams'
 
     // Return with a bad request
     return respondJSON(request, response, 400, responseJSON);
@@ -59,8 +63,11 @@ const updateUser = (request, response, data) => {
       // Update the age
       users[newUser.name].age = newUser.age;
 
+      // Update the response
+      responseJSON = { };
+
       // Return with no content status
-      return respondJSON(request, response, 204, users[newUser.name]);
+      return respondJSON(request, response, 204, responseJSON);
     }
   }
 
@@ -70,7 +77,7 @@ const updateUser = (request, response, data) => {
   users[newUser.name].age = newUser.age;
 
   // Return with a created status
-  return respondJSON(request, response, 201, newUser);
+  return respondJSON(request, response, 201, responseJSON);
 };
 
 const notFound = (request, response) => {
