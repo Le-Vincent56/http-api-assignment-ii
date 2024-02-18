@@ -35,7 +35,7 @@ const getUsersMeta = (request, response) => {
 
 const updateUser = (request, response, data) => {
   // Create a response
-  let responseJSON = {
+  const responseJSON = {
     message: 'User created successfully',
     id: 'userCreatedSuccess',
   };
@@ -48,9 +48,8 @@ const updateUser = (request, response, data) => {
 
   // Check if both a name and age were given
   if (!newUser.name || !newUser.age) {
-    // Update response
     responseJSON.message = 'Name and age are both required to add or update an existing user';
-    responseJSON.id = 'addUserMissingParams'
+    responseJSON.id = 'addUserMissingParams';
 
     // Return with a bad request
     return respondJSON(request, response, 400, responseJSON);
@@ -63,11 +62,8 @@ const updateUser = (request, response, data) => {
       // Update the age
       users[newUser.name].age = newUser.age;
 
-      // Update the response
-      responseJSON = { };
-
       // Return with no content status
-      return respondJSON(request, response, 204, responseJSON);
+      return respondJSONMeta(request, response, 204);
     }
   }
 

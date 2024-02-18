@@ -21,7 +21,7 @@
           break;
 
         case 204:
-          content.innerHTML = '<b>Updated</b>'
+          content.innerHTML = '<b>Updated (No Content)</b>'
           break;
 
         case 400:
@@ -49,9 +49,6 @@
           // Display the messgae
           content.innerHTML += `<p>${obj.message}</p>`;
         }
-
-        // Print the object in the console
-        console.log(JSON.stringify(obj));
       } else {
         // State that meta data was received if a response should not be parsed
         content.innerHTML += '<p>Meta Data Received</p>';
